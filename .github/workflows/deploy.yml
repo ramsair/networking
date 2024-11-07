@@ -9,6 +9,7 @@ jobs:
   setup-infra:
     runs-on: ubuntu-latest
     timeout-minutes: 60  # Timeout after 60 minutes if the job runs too long
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
@@ -16,7 +17,7 @@ jobs:
       - name: Set up Terraform
         uses: hashicorp/setup-terraform@v2
         with:
-          terraform_version: 1.0.0
+          terraform_version: 1.5.5  # Use the latest stable version
 
       - name: Initialize Terraform
         working-directory: terraform  # Specify the terraform folder
@@ -27,6 +28,10 @@ jobs:
           ARM_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
         run: terraform init
 
+      - name: Terraform Validate
+        working-directory: terraform  # Specify the terraform folder
+        run: terraform validate
+
       - name: Terraform Plan
         working-directory: terraform  # Specify the terraform folder
         env:
@@ -34,7 +39,7 @@ jobs:
           ARM_CLIENT_SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
           ARM_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
           ARM_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
-        run: terraform plan
+        run: terraform plan -parallelism=3 -compact-warnings
 
       - name: Apply Terraform Configuration
         working-directory: terraform  # Specify the terraform folder
@@ -43,4 +48,4 @@ jobs:
           ARM_CLIENT_SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
           ARM_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
           ARM_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
-        run: terraform apply -auto-approve
+        run: terraform apply -auto-approve -parallelism=3 -compact-warnings
