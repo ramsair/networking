@@ -38,3 +38,5 @@ jobs:
         uses: ansible/ansible-runner-action@v2
         with:
           playbook: ansible/ansible-playbook.yml
+
+          #sample
