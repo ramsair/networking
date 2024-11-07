@@ -1,0 +1,20 @@
+---
+- hosts: all
+  tasks:
+    - name: Install Docker
+      apt:
+        name: docker.io
+        state: present
+
+    - name: Pull Docker image
+      docker_image:
+        name: nginx
+        source: pull
+
+    - name: Run Docker container
+      docker_container:
+        name: my_container
+        image: nginx
+        state: started
+        ports:
+          - "80:80"
